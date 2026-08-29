@@ -1,6 +1,6 @@
 
 LIST_OF_VOWELS = [
-    "a", "e", "i", "o", "u", "y"
+    "a", "e", "i", "o", "u", 
 ]
 
 LIST_OF_CONSONANTS = [
@@ -8,7 +8,14 @@ LIST_OF_CONSONANTS = [
     "n", "p", "q", "r", "s", "t", "v", "w", "x", "y", "z"
 ]
 
-SINGLE_SOUND_GROUPS = [
+SPECIAL_CASES = {
+    "quiet": 2,
+    "idea": 3,
+    "rhythm": 2,
+    "create":2
+}
+
+ONE_SYLLABLE_GROUPS = [
     "ai",
     "au",
     "aw",
@@ -27,7 +34,7 @@ SINGLE_SOUND_GROUPS = [
     "oy"
 ]
 
-MULTIPLE_SOUND_GROUPS = [
+TWO_SYLLABLE_GROUPS = [
     "ia",
     "ie",
     "io",
@@ -43,7 +50,7 @@ MULTIPLE_SOUND_GROUPS = [
     "oa"
 ]
 
-THREE_VOWEL_GROUPS = [
+ONE_SYLLABLE_THREE_VOWEL_GROUPS = [
     "eau",
     "ieu",
     "iou",
@@ -208,7 +215,56 @@ def word_splitter(poem):
     print(words_list)
     return words_list
 
-def estimate_word_syllables_old(word):
+def estimate_word_syllables(word):
+
+    if word in SPECIAL_CASES:
+        return SPECIAL_CASES[word]
+
+    vowel_groups = scan_vowels(word)
+
+    syllables = 0
+
+    for group in vowel_groups:
+
+        if group in ONE_SYLLABLE_GROUPS:
+            syllables += 1
+
+        elif group in TWO_SYLLABLE_GROUPS:
+            syllables += 2
+
+        elif group in ONE_SYLLABLE_THREE_VOWEL_GROUPS:
+            syllables += 1
+
+        else:
+            syllables += 1
+
+    if word.endswith('le'):
+        is_con = False
+        for c in LIST_OF_CONSONANTS:
+              m=''
+              m += c + 'le'
+
+              if word.endswith(m):
+                   is_con = True
+                   syllables+=1
+                   break
+              else:
+                   continue
+        if is_con:
+            syllables-=1
+    elif word.endswith("ed") and word not in ED_ADDS_SYLLABLE:
+        syllables -= 1
+
+    elif word.endswith("e") and len(word) > 2:
+        syllables -= 1
+    elif word in Y_AS_VOWEL:
+         syllables+=1
+    elif word in Y_AS_CONSONANT:
+         syllables-=1
+
+    return syllables        
+
+# def estimate_word_syllables_old(word):
     syllable_count = 0
     group = []
     str_group =''
@@ -230,13 +286,13 @@ def estimate_word_syllables_old(word):
 
                 
 
-        if temp_group in SINGLE_SOUND_GROUPS:
+        if temp_group in ONE_SYLLABLE_GROUPS:
             prev_group = temp_group
             if i+1 < len(word):
 
                 temp_group = prev_group + word[i+1]
 
-            if temp_group in THREE_VOWEL_GROUPS:
+            if temp_group in ONE_SYLLABLE_THREE_VOWEL_GROUPS:
                 if word[i] in LIST_OF_CONSONANTS:
                     group.append(prev_group)
                                     
@@ -250,12 +306,12 @@ def estimate_word_syllables_old(word):
                 
                     str_group = ""
                     
-        elif prev_group in THREE_VOWEL_GROUPS:
+        elif prev_group in ONE_SYLLABLE_THREE_VOWEL_GROUPS:
             if i+1 < len(word):
                 
                 if word[i] in LIST_OF_CONSONANTS:
                     group.append(str_group)
-        elif prev_group in MULTIPLE_SOUND_GROUPS:
+        elif prev_group in TWO_SYLLABLE_GROUPS:
             print("multi")
             if i+1 < len(word):
                 print(str_group)
@@ -323,7 +379,7 @@ def estimate_word_syllables_old(word):
     print(group)
     
 
-def estimate_syllables(word_list):
+# def estimate_syllables(word_list):
     syllable_count_list = []
     syllable_count=0 
     
@@ -384,16 +440,8 @@ def main():
     # estimate_syllables(words_list)
     
     # estimate_word_syllables('piano')
-    group = ["piano",
-"beautiful",
-"banana",
-"computer",
-"lion",
-"cloud",
-"book",
-"create",
-"idea"]
-    for word in group:
-         print(scan_vowels(word))
+    for word, expected in SYLLABLE_TEST_WORDS.items():
+        result = estimate_word_syllables(word)
+        print(f"{word}: expected={expected}, got={result}")
 if __name__ == "__main__":
     main()
