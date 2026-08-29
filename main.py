@@ -186,6 +186,9 @@ def input_poetry(poem=''):
         for i in range(3):
             poem_line = input(f"Enter {i+1} Line Of The Poem: ")
 
+            if len(poem_line) == 0:
+                poem_line = input(f"Please Enter {i+1} Line Of The Poem, Do not leave it empty: ")
+
             lines.append(poem_line)
 
 
@@ -287,171 +290,11 @@ def estimate_syllables(word_list):
          syllables += estimate_word_syllables(word)
     return line_syllables
 
-
-# def estimate_word_syllables_old(word):
-    syllable_count = 0
-    group = []
-    str_group =''
-    prev_group = ''
-    i = 0
-    for letter in word:
-        
-
-        if letter in LIST_OF_VOWELS:
-            str_group += letter
-        else:
-            if str_group != "":
-                group.append(str_group)
-                str_group = ""
-
-        prev_group = str_group
-        temp_group = prev_group + word[i]
-        print(prev_group+" "+temp_group)
-
-                
-
-        if temp_group in ONE_SYLLABLE_GROUPS:
-            prev_group = temp_group
-            if i+1 < len(word):
-
-                temp_group = prev_group + word[i+1]
-
-            if temp_group in ONE_SYLLABLE_THREE_VOWEL_GROUPS:
-                if word[i] in LIST_OF_CONSONANTS:
-                    group.append(prev_group)
-                                    
-                    str_group = ""
-                                    
-                
-
-            if i+1 < len(word):
-                if word[i] in LIST_OF_CONSONANTS:
-                    group.append(prev_group)
-                
-                    str_group = ""
-                    
-        elif prev_group in ONE_SYLLABLE_THREE_VOWEL_GROUPS:
-            if i+1 < len(word):
-                
-                if word[i] in LIST_OF_CONSONANTS:
-                    group.append(str_group)
-        elif prev_group in TWO_SYLLABLE_GROUPS:
-            print("multi")
-            if i+1 < len(word):
-                print(str_group)
-                print(temp_group)
-                print(prev_group)
-
-                if word[i] in LIST_OF_CONSONANTS:
-                        group.append(str_group)
-                        str_group = ""
-                    
-
-
-        print(group)
-            
-
-            
-            
-        if letter in LIST_OF_VOWELS:
-            i+=1
-            syllable_count+=1
-            str_group +=  str_group.join(letter)
-            
-            
-        else:
-             i+=1
-    if str_group in LIST_OF_VOWELS:
-         group.append(str_group)
-    syllable_count = len(group)
-    if 'y' in word:
-         if word in Y_AS_VOWEL:
-              syllable_count+=0
-         if word in Y_AS_CONSONANT:
-              syllable_count-=1
-
-
-    if word.endswith('ed'):
-         if word in ED_ADDS_SYLLABLE:
-              syllable_count+=0
-         if word in ED_NO_EXTRA_SYLLABLE:
-            syllable_count-=1   
-    if word.endswith('le'):
-        if word in LE_NO_EXTRA_SYLLABLE:
-             syllable_count-=1
-        is_con_end = False
-        for c in LIST_OF_CONSONANTS:
-                ending = c + 'le'
-                print(ending)
-                
-                if word.endswith(ending):
-                    print("y")
-                    syllable_count+=1
-                    is_con_end = True
-                    break
-                else:
-                    continue
-        if is_con_end == False:
-                syllable_count-=1
-                
-        
-
-        syllable_count-=1
-    if word.endswith('e') and len(word)>2:
-        syllable_count-=1
-    print(f"{word} - {syllable_count}")
-    print(group)
-    
-
-# def estimate_syllables(word_list):
-    syllable_count_list = []
-    syllable_count=0 
-    
-    for word in word_list:
-        if word == "END":
-            syllable_count_list.append(syllable_count)
-            syllable_count=0 
-            continue
-        for letter in word:
-            if letter in ['a','e','u','i','o']:
-                syllable_count+=1
-        if word.endswith('ou'):
-            syllable_count-=1
-
-        if word.endswith('oo'):
-            syllable_count-=1
-        if 'uie' in word:
-                syllable_count-=2
-        if 'eau' in word:
-                syllable_count-=2
-        if word.endswith('y'):
-                syllable_count+=1
-        if 'ei' in word:
-                syllable_count-=1
-        if 'ou' in word:
-             syllable_count-=1
-        if word.endswith('ed'):
-            syllable_count-=1
-        if word.endswith('le'):
-            is_con_end = False
-            for c in LIST_OF_CONSONANTS:
-                 ending = c.join('le')
-                 if word.endswith(ending):
-                      syllable_count+=1
-                      is_con_end = True
-                      break
-                 else:
-                    continue
-            if is_con_end == False:
-                 syllable_count-=1
-                 
-            
-
-            syllable_count-=1
-        if word.endswith('e') and len(word)>2:
-            syllable_count-=1
-
-    print(syllable_count_list)
+def is_haiku(structure):
+     if structure == [5,7,5]:
+        return True
+     else:
+          return False
 
 
 def main():
@@ -461,15 +304,11 @@ def main():
 
     words_list = word_splitter(poem)
 
-    print(estimate_syllables(words_list))
+    result = estimate_syllables(words_list)
 
-    if estimate_syllables(words_list) == [5, 7, 5]:
-        print("This peom follows the 5,7,5 structure!")
+    if is_haiku(result):
+        print("This poem follows the 5,7,5 structure!")
     else:
-        print("This does not follow the 5,7,5 structure.")
-    # estimate_word_syllables('piano')
-    # for word, expected in SYLLABLE_TEST_WORDS.items():
-    #     result = estimate_word_syllables(word)
-    #     print(f"{word}: expected={expected}, got={result}")
+        print(f"This does not follow the 5,7,5 structure.\n Expected 5 got {result[0]} \n Expected 7 got {result[1]}\n Expected 5 got {result[2]}" )
 if __name__ == "__main__":
     main()
