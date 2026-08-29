@@ -12,7 +12,8 @@ SPECIAL_CASES = {
     "quiet": 2,
     "idea": 3,
     "rhythm": 2,
-    "create":2
+    "create":2,
+    "the":1
 }
 
 ONE_SYLLABLE_GROUPS = [
@@ -164,7 +165,17 @@ SYLLABLE_TEST_WORDS = {
     "piano": 3,
     "lion": 2,
     "create": 2,
-    "idea": 3
+    "idea": 3,
+    "an": 1,
+"old": 1,
+"silent": 2,
+"pond": 1,
+"frog": 1,
+"jumps": 1,
+"into": 2,
+"splash": 1,
+"silence": 2,
+"again": 2,
 }
 
 def input_poetry(poem=''):
@@ -205,18 +216,17 @@ def scan_vowels(word):
 
 def word_splitter(poem):
     words_list = []
-    line_count = 0
+
     for line in poem:
-        line_count+=1
-        for word in line.split(' '):
+        for word in line.split():
+            word = word.strip('.,!?;;:')
             words_list.append(word)
         words_list.append(f'END')
         
-    print(words_list)
     return words_list
 
 def estimate_word_syllables(word):
-
+    word = word.lower()
     if word in SPECIAL_CASES:
         return SPECIAL_CASES[word]
 
@@ -263,6 +273,20 @@ def estimate_word_syllables(word):
          syllables-=1
 
     return syllables        
+
+def estimate_syllables(word_list):
+    line_syllables = []
+    syllables = 0
+
+    for word in word_list:
+
+         if word == "END":
+              line_syllables.append(syllables)
+              syllables = 0
+              continue
+         syllables += estimate_word_syllables(word)
+    return line_syllables
+
 
 # def estimate_word_syllables_old(word):
     syllable_count = 0
@@ -433,15 +457,19 @@ def estimate_word_syllables(word):
 def main():
     print("Haiku Checker - CLI")
 
-    # poem = input_poetry("You and me alone,Madness of world locked away,Peace and quiet reigns")
+    poem = input_poetry()
 
-    # words_list = word_splitter(poem)
+    words_list = word_splitter(poem)
 
-    # estimate_syllables(words_list)
-    
+    print(estimate_syllables(words_list))
+
+    if estimate_syllables(words_list) == [5, 7, 5]:
+        print("This peom follows the 5,7,5 structure!")
+    else:
+        print("This does not follow the 5,7,5 structure.")
     # estimate_word_syllables('piano')
-    for word, expected in SYLLABLE_TEST_WORDS.items():
-        result = estimate_word_syllables(word)
-        print(f"{word}: expected={expected}, got={result}")
+    # for word, expected in SYLLABLE_TEST_WORDS.items():
+    #     result = estimate_word_syllables(word)
+    #     print(f"{word}: expected={expected}, got={result}")
 if __name__ == "__main__":
     main()
