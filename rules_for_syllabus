@@ -1,0 +1,8 @@
+each syllable ha a vowel sound a,e,u,i,o
+count syllable if y makes a sound of the vowel
+subtract 1 if e is at the end
+subtract one for each diphthong or triphthong
+diphthong when 2 vowels make only 1 sound au,oy,oo
+triphthlong when three make only 1 sound iou
+if word ends with le or les add one if the letter before le is a consonant
+unaffected by consonant sounds
