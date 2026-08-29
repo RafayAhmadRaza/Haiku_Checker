@@ -178,6 +178,24 @@ def input_poetry(poem=''):
         lines = poem.split(",")
         return lines
 
+
+def scan_vowels(word):
+    groups = []
+    current = ""
+
+    for letter in word:
+        if letter in LIST_OF_VOWELS:
+            current += letter
+        else:
+            if current != "":
+                groups.append(current)
+                current = ""
+
+    if current != "":
+        groups.append(current)
+
+    return groups
+
 def word_splitter(poem):
     words_list = []
     line_count = 0
@@ -190,63 +208,82 @@ def word_splitter(poem):
     print(words_list)
     return words_list
 
-def estimate_word_syllables(word):
+def estimate_word_syllables_old(word):
     syllable_count = 0
-    group = ''
+    group = []
+    str_group =''
     prev_group = ''
     i = 0
-
-    is_single_sound = False
-    is_multiple_sound = False
-    is_three_vowel_sound = False
     for letter in word:
-        if len(group) >= 1:
-             #check which group it can be possible within
-             prev_group = group
+        
 
-             temp_group = prev_group + word[i]
+        if letter in LIST_OF_VOWELS:
+            str_group += letter
+        else:
+            if str_group != "":
+                group.append(str_group)
+                str_group = ""
 
+        prev_group = str_group
+        temp_group = prev_group + word[i]
+        print(prev_group+" "+temp_group)
 
-             if i+1 < len(word):
-               if word[i] in LIST_OF_CONSONANTS:
-                    group = ""
+                
+
+        if temp_group in SINGLE_SOUND_GROUPS:
+            prev_group = temp_group
+            if i+1 < len(word):
+
+                temp_group = prev_group + word[i+1]
+
+            if temp_group in THREE_VOWEL_GROUPS:
+                if word[i] in LIST_OF_CONSONANTS:
+                    group.append(prev_group)
+                                    
+                    str_group = ""
+                                    
+                
+
+            if i+1 < len(word):
+                if word[i] in LIST_OF_CONSONANTS:
+                    group.append(prev_group)
+                
+                    str_group = ""
+                    
+        elif prev_group in THREE_VOWEL_GROUPS:
+            if i+1 < len(word):
+                
+                if word[i] in LIST_OF_CONSONANTS:
+                    group.append(str_group)
+        elif prev_group in MULTIPLE_SOUND_GROUPS:
+            print("multi")
+            if i+1 < len(word):
+                print(str_group)
+                print(temp_group)
+                print(prev_group)
+
+                if word[i] in LIST_OF_CONSONANTS:
+                        group.append(str_group)
+                        str_group = ""
                     
 
-             if temp_group in SINGLE_SOUND_GROUPS:
-                  prev_group = temp_group
-                  if i+1 < len(word):
-                    if word[i] in LIST_OF_CONSONANTS:
-                         group = ""
-                        
-                    else:
-                        temp_group = prev_group + word[i+1]
-                        is_single_sound = True
-                        if temp_group in THREE_VOWEL_GROUPS:
-                         is_three_vowel_sound = True
-                         is_single_sound = False
-             elif temp_group in THREE_VOWEL_GROUPS:
-                  is_three_vowel_sound = True
-             elif temp_group in MULTIPLE_SOUND_GROUPS:
-                  is_single_sound = False
 
-                  
-                  
+        print(group)
+            
+
+            
+            
         if letter in LIST_OF_VOWELS:
             i+=1
             syllable_count+=1
-            group += group.join(letter)
+            str_group +=  str_group.join(letter)
+            
             
         else:
              i+=1
-             continue
-    if is_single_sound:
-         syllable_count-=1
-    elif is_three_vowel_sound:
-         syllable_count-=2
-    elif is_multiple_sound:
-         syllable_count-=1
-
-
+    if str_group in LIST_OF_VOWELS:
+         group.append(str_group)
+    syllable_count = len(group)
     if 'y' in word:
          if word in Y_AS_VOWEL:
               syllable_count+=0
@@ -265,8 +302,10 @@ def estimate_word_syllables(word):
         is_con_end = False
         for c in LIST_OF_CONSONANTS:
                 ending = c + 'le'
+                print(ending)
                 
                 if word.endswith(ending):
+                    print("y")
                     syllable_count+=1
                     is_con_end = True
                     break
@@ -281,6 +320,7 @@ def estimate_word_syllables(word):
     if word.endswith('e') and len(word)>2:
         syllable_count-=1
     print(f"{word} - {syllable_count}")
+    print(group)
     
 
 def estimate_syllables(word_list):
@@ -343,8 +383,17 @@ def main():
 
     # estimate_syllables(words_list)
     
-    # estimate_word_syllables('computer')
-    for word in SYLLABLE_TEST_WORDS:
-         estimate_word_syllables(word)
+    # estimate_word_syllables('piano')
+    group = ["piano",
+"beautiful",
+"banana",
+"computer",
+"lion",
+"cloud",
+"book",
+"create",
+"idea"]
+    for word in group:
+         print(scan_vowels(word))
 if __name__ == "__main__":
     main()
